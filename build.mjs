@@ -1,40 +1,72 @@
-import type { SemanticToken } from "../shared/types";
+import esbuild from "esbuild";
+import { readFile, writeFile, mkdir } from "node:fs/promises";
+import path from "node:path";
 
-// Preference lists: the builder picks the first scale that exists in the
-// selected set, so semantic tokens stay meaningful across libraries.
-const NEUTRALS = ["slate", "gray", "grey", "neutral", "zinc", "stone", "blueGrey"];
-const SUCCESS = ["green", "emerald", "lightGreen"];
-const ERROR = ["red", "rose"];
-const WARNING = ["amber", "orange", "yellow"];
-const INFO = ["blue", "sky", "lightBlue", "indigo"];
+const watch = process.argv.includes("--watch");
+const outdir = "dist";
 
-function pick(available: string[], prefs: string[], fallback: string): string {
-  return prefs.find((p) => available.includes(p)) ?? fallback;
+await mkdir(outdir, { recursive: true });
+
+/** Compose dist/ui.html by inlining the bundled JS + CSS into one file. */
+async function writeHtml(js) {
+  const css = await readFile("src/ui/styles.css", "utf8");
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>${css}</style>
+</head>
+<body>
+  <div id="root"></div>
+  <script>${js}</script>
+</body>
+</html>`;
+  await writeFile(path.join(outdir, "ui.html"), html, "utf8");
+  console.log("✓ ui.html built");
 }
 
-/**
- * Build the semantic/alias token set, aliasing the most appropriate base
- * scale that is actually present in the user's selection.
- */
-export function buildSemanticTokens(primaryScale: string, available: string[]): SemanticToken[] {
-  const neutral = pick(available, NEUTRALS, primaryScale);
-  const success = pick(available, SUCCESS, primaryScale);
-  const error = pick(available, ERROR, primaryScale);
-  const warning = pick(available, WARNING, primaryScale);
-  const info = pick(available, INFO, primaryScale);
+/** esbuild plugin that, on every successful build, inlines output into HTML. */
+const inlineHtmlPlugin = {
+  name: "inline-html",
+  setup(build) {
+    build.onEnd(async (result) => {
+      const out = result.outputFiles?.find((f) => f.path.endsWith(".js"));
+      if (out) await writeHtml(out.text);
+    });
+  },
+};
 
-  return [
-    { name: "color-primary", label: "Primary", light: { scale: primaryScale, step: "600" }, dark: { scale: primaryScale, step: "400" } },
-    { name: "color-primary-hover", label: "Primary Hover", light: { scale: primaryScale, step: "700" }, dark: { scale: primaryScale, step: "300" } },
-    { name: "color-on-primary", label: "On Primary", light: { scale: neutral, step: "50" }, dark: { scale: neutral, step: "50" } },
-    { name: "color-success", label: "Success", light: { scale: success, step: "600" }, dark: { scale: success, step: "400" } },
-    { name: "color-error", label: "Error", light: { scale: error, step: "600" }, dark: { scale: error, step: "400" } },
-    { name: "color-warning", label: "Warning", light: { scale: warning, step: "500" }, dark: { scale: warning, step: "400" } },
-    { name: "color-info", label: "Info", light: { scale: info, step: "600" }, dark: { scale: info, step: "400" } },
-    { name: "color-background", label: "Background", light: { scale: neutral, step: "50" }, dark: { scale: neutral, step: "950" } },
-    { name: "color-surface", label: "Surface", light: { scale: neutral, step: "100" }, dark: { scale: neutral, step: "900" } },
-    { name: "color-border", label: "Border", light: { scale: neutral, step: "200" }, dark: { scale: neutral, step: "800" } },
-    { name: "color-text", label: "Text", light: { scale: neutral, step: "900" }, dark: { scale: neutral, step: "50" } },
-    { name: "color-text-muted", label: "Text Muted", light: { scale: neutral, step: "500" }, dark: { scale: neutral, step: "400" } },
-  ];
+const codeCtx = await esbuild.context({
+  entryPoints: ["src/code.ts"],
+  bundle: true,
+  outfile: path.join(outdir, "code.js"),
+  target: "es2020",
+  format: "iife",
+  logLevel: "info",
+});
+
+const uiOptions = {
+  entryPoints: ["src/ui/main.tsx"],
+  bundle: true,
+  write: false,
+  target: "es2020",
+  format: "iife",
+  jsx: "automatic",
+  jsxImportSource: "preact",
+  loader: { ".css": "text", ".svg": "text" },
+  logLevel: "info",
+};
+
+if (watch) {
+  const uiCtx = await esbuild.context({ ...uiOptions, plugins: [inlineHtmlPlugin] });
+  await codeCtx.watch();
+  await uiCtx.watch();
+  console.log("watching…");
+} else {
+  await codeCtx.rebuild();
+  await codeCtx.dispose();
+  const result = await esbuild.build(uiOptions);
+  await writeHtml(result.outputFiles[0].text);
+  console.log("✓ build complete");
 }

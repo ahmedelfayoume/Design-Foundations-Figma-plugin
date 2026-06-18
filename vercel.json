@@ -1,15 +1,8 @@
 {
-  "name": "AM Gym — Design Foundations",
-  "id": "am-gym-design-foundations",
-  "api": "1.0.0",
-  "main": "dist/code.js",
-  "ui": "dist/ui.html",
-  "editorType": ["figma"],
-  "documentAccess": "dynamic-page",
-  "networkAccess": {
-    "allowedDomains": [
-      "https://am-gym.vercel.app"
-    ],
-    "reasoning": "Used to reach the AM Gym backend on Vercel, which proxies Gemini AI requests (color palette, content, SVG and typography generation) so the API key stays server-side."
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/gemini.js": {
+      "maxDuration": 30
+    }
   }
 }
