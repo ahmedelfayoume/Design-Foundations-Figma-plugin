@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>:root {
+  --bg: var(--figma-color-bg, #ffffff);
+  --bg-secondary: var(--figma-color-bg-secondary, #f5f5f5);
+  --text: var(--figma-color-text, #1e1e1e);
+  --text-secondary: var(--figma-color-text-secondary, #6b7280);
+  --border: var(--figma-color-border, #e6e6e6);
+  --brand: #6366f1;
+  --brand-hover: #4f46e5;
+  --radius: 8px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Inter, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 12px;
+  color: var(--text);
+  background: var(--bg);
+}
+
+#root { display: flex; flex-direction: column; height: 100vh; }
+
+.tabs {
+  display: flex;
+  gap: 2px;
+  padding: 8px 12px 0;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+.tab {
+  padding: 8px 12px;
+  border: none;
+  background: none;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+.tab.active { color: var(--brand); border-bottom-color: var(--brand); }
+
+.panel { flex: 1; overflow-y: auto; padding: 16px; }
+
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 12px 16px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+h3 { margin: 0 0 4px; font-size: 13px; }
+.muted { color: var(--text-secondary); font-size: 11px; margin: 0 0 12px; }
+
+.btn {
+  border: none;
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--bg-secondary);
+  color: var(--text);
+}
+.btn:hover { filter: brightness(0.97); }
+.btn-primary { background: var(--brand); color: #fff; flex: 1; }
+.btn-primary:hover { background: var(--brand-hover); }
+.btn-sm { padding: 6px 10px; font-size: 11px; }
+
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.spacer { flex: 1; }
+
+.field { margin-bottom: 12px; }
+label.field-label { display: block; font-weight: 500; margin-bottom: 6px; }
+
+select, input[type="text"], input[type="number"], textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 12px;
+  font-family: inherit;
+}
+textarea { resize: vertical; min-height: 64px; }
+
+.scale-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+.scale-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+.scale-chip.selected { border-color: var(--brand); background: color-mix(in srgb, var(--brand) 8%, transparent); }
+.scale-chip .swatch-strip { display: flex; border-radius: 4px; overflow: hidden; width: 44px; height: 18px; }
+.scale-chip .swatch-strip span { flex: 1; }
+.scale-chip .name { font-size: 11px; }
+.scale-chip .star { margin-left: auto; opacity: 0.4; }
+.scale-chip .star.on { opacity: 1; color: #f59e0b; }
+
+.toggle { display: flex; align-items: center; gap: 8px; padding: 8px 0; cursor: pointer; }
+.toggle input { width: auto; }
+
+.token-row { display: grid; grid-template-columns: 1fr 56px 56px 56px; gap: 6px; align-items: center; margin-bottom: 6px; }
+.token-row .tname { font-size: 11px; }
+
+.modes { display: flex; gap: 8px; }
+.mode-chip { padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; }
+.mode-chip.on { border-color: var(--brand); color: var(--brand); font-weight: 600; }
+
+.export-out { width: 100%; min-height: 200px; font-family: ui-monospace, Menlo, monospace; font-size: 11px; }
+
+.ai-result { margin-top: 12px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-secondary); }
+.ai-swatches { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.ai-swatches span { width: 28px; height: 28px; border-radius: 4px; border: 1px solid var(--border); }
+
+.banner { font-size: 11px; padding: 8px 10px; border-radius: 6px; background: color-mix(in srgb, var(--brand) 10%, transparent); margin-bottom: 12px; }
+.status { font-size: 11px; color: var(--text-secondary); }
+.error { color: #dc2626; }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+  <script>"use strict";
+(() => {
+  // node_modules/preact/dist/preact.module.js
+  var n;
+  var l;
+  var u;
+  var t;
+  var i;
+  var r;
+  var o;
+  var e;
+  var f;
+  var c;
+  var a;
+  var s;
+  var h;
+  var p;
+  var v;
+  var y;
+  var d = {};
+  var w = [];
+  var _ = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i;
+  var g = Array.isArray;
+  function m(n2, l3) {
+    for (var u4 in l3) n2[u4] = l3[u4];
+    return n2;
+  }
+  function b(n2) {
+    n2 && n2.parentNode && n2.parentNode.removeChild(n2);
+  }
+  function k(l3, u4, t3) {
+    var i4, r3, o3, e3 = {};
+    for (o3 in u4) "key" == o3 ? i4 = u4[o3] : "ref" == o3 ? r3 = u4[o3] : e3[o3] = u4[o3];
+    if (arguments.length > 2 && (e3.children = arguments.length > 3 ? n.call(arguments, 2) : t3), "function" == typeof l3 && null != l3.defaultProps) for (o3 in l3.defaultProps) void 0 === e3[o3] && (e3[o3] = l3.defaultProps[o3]);
+    return x(l3, e3, i4, r3, null);
+  }
+  function x(n2, t3, i4, r3, o3) {
+    var e3 = { type: n2, props: t3, key: i4, ref: r3, __k: null, __: null, __b: 0, __e: null, __c: null, constructor: void 0, __v: null == o3 ? ++u : o3, __i: -1, __u: 0 };
+    return null == o3 && null != l.vnode && l.vnode(e3), e3;
+  }
+  function S(n2) {
+    return n2.children;
+  }
+  function C(n2, l3) {
+    this.props = n2, this.context = l3;
+  }
+  function $(n2, l3) {
+    if (null == l3) return n2.__ ? $(n2.__, n2.__i + 1) : null;
+    for (var u4; l3 < n2.__k.length; l3++) if (null != (u4 = n2.__k[l3]) && null != u4.__e) return u4.__e;
+    return "function" == typeof n2.type ? $(n2) : null;
+  }
+  function I(n2) {
+    if (n2.__P && n2.__d) {
+      var u4 = n2.__v, t3 = u4.__e, i4 = [], r3 = [], o3 = m({}, u4);
+      o3.__v = u4.__v + 1, l.vnode && l.vnode(o3), q(n2.__P, o3, u4, n2.__n, n2.__P.namespaceURI, 32 & u4.__u ? [t3] : null, i4, null == t3 ? $(u4) : t3, !!(32 & u4.__u), r3), o3.__v = u4.__v, o3.__.__k[o3.__i] = o3, D(i4, o3, r3), u4.__e = u4.__ = null, o3.__e != t3 && P(o3);
+    }
+  }
+  function P(n2) {
+    if (null != (n2 = n2.__) && null != n2.__c) return n2.__e = n2.__c.base = null, n2.__k.some(function(l3) {
+      if (null != l3 && null != l3.__e) return n2.__e = n2.__c.base = l3.__e;
+    }), P(n2);
+  }
+  function A(n2) {
+    (!n2.__d && (n2.__d = true) && i.push(n2) && !H.__r++ || r != l.debounceRendering) && ((r = l.debounceRendering) || o)(H);
+  }
+  function H() {
+    try {
+      for (var n2, l3 = 1; i.length; ) i.length > l3 && i.sort(e), n2 = i.shift(), l3 = i.length, I(n2);
+    } finally {
+      i.length = H.__r = 0;
+    }
+  }
+  function L(n2, l3, u4, t3, i4, r3, o3, e3, f4, c3, a3) {
+    var s3, h3, p3, v3, y3, _2, g2, m3 = t3 && t3.__k || w, b2 = l3.length;
+    for (f4 = T(u4, l3, m3, f4, b2), s3 = 0; s3 < b2; s3++) null != (p3 = u4.__k[s3]) && (h3 = -1 != p3.__i && m3[p3.__i] || d, p3.__i = s3, _2 = q(n2, p3, h3, i4, r3, o3, e3, f4, c3, a3), v3 = p3.__e, p3.ref && h3.ref != p3.ref && (h3.ref && J(h3.ref, null, p3), a3.push(p3.ref, p3.__c || v3, p3)), null == y3 && null != v3 && (y3 = v3), (g2 = !!(4 & p3.__u)) || h3.__k === p3.__k ? (f4 = j(p3, f4, n2, g2), g2 && h3.__e && (h3.__e = null)) : "function" == typeof p3.type && void 0 !== _2 ? f4 = _2 : v3 && (f4 = v3.nextSibling), p3.__u &= -7);
+    return u4.__e = y3, f4;
+  }
+  function T(n2, l3, u4, t3, i4) {
+    var r3, o3, e3, f4, c3, a3 = u4.length, s3 = a3, h3 = 0;
+    for (n2.__k = new Array(i4), r3 = 0; r3 < i4; r3++) null != (o3 = l3[r3]) && "boolean" != typeof o3 && "function" != typeof o3 ? ("string" == typeof o3 || "number" == typeof o3 || "bigint" == typeof o3 || o3.constructor == String ? o3 = n2.__k[r3] = x(null, o3, null, null, null) : g(o3) ? o3 = n2.__k[r3] = x(S, { children: o3 }, null, null, null) : void 0 === o3.constructor && o3.__b > 0 ? o3 = n2.__k[r3] = x(o3.type, o3.props, o3.key, o3.ref ? o3.ref : null, o3.__v) : n2.__k[r3] = o3, f4 = r3 + h3, o3.__ = n2, o3.__b = n2.__b + 1, e3 = null, -1 != (c3 = o3.__i = O(o3, u4, f4, s3)) && (s3--, (e3 = u4[c3]) && (e3.__u |= 2)), null == e3 || null == e3.__v ? (-1 == c3 && (i4 > a3 ? h3-- : i4 < a3 && h3++), "function" != typeof o3.type && (o3.__u |= 4)) : c3 != f4 && (c3 == f4 - 1 ? h3-- : c3 == f4 + 1 ? h3++ : (c3 > f4 ? h3-- : h3++, o3.__u |= 4))) : n2.__k[r3] = null;
+    if (s3) for (r3 = 0; r3 < a3; r3++) null != (e3 = u4[r3]) && 0 == (2 & e3.__u) && (e3.__e == t3 && (t3 = $(e3)), K(e3, e3));
+    return t3;
+  }
+  function j(n2, l3, u4, t3) {
+    var i4, r3;
+    if ("function" == typeof n2.type) {
+      for (i4 = n2.__k, r3 = 0; i4 && r3 < i4.length; r3++) i4[r3] && (i4[r3].__ = n2, l3 = j(i4[r3], l3, u4, t3));
+      return l3;
+    }
+    n2.__e != l3 && (t3 && (l3 && n2.type && !l3.parentNode && (l3 = $(n2)), u4.insertBefore(n2.__e, l3 || null)), l3 = n2.__e);
+    do {
+      l3 = l3 && l3.nextSibling;
+    } while (null != l3 && 8 == l3.nodeType);
+    return l3;
+  }
+  function O(n2, l3, u4, t3) {
+    var i4, r3, o3, e3 = n2.key, f4 = n2.type, c3 = l3[u4], a3 = null != c3 && 0 == (2 & c3.__u);
+    if (null === c3 && null == e3 || a3 && e3 == c3.key && f4 == c3.type) return u4;
+    if (t3 > (a3 ? 1 : 0)) {
+      for (i4 = u4 - 1, r3 = u4 + 1; i4 >= 0 || r3 < l3.length; ) if (null != (c3 = l3[o3 = i4 >= 0 ? i4-- : r3++]) && 0 == (2 & c3.__u) && e3 == c3.key && f4 == c3.type) return o3;
+    }
+    return -1;
+  }
+  function z(n2, l3, u4) {
+    "-" == l3[0] ? n2.setProperty(l3, null == u4 ? "" : u4) : n2[l3] = null == u4 ? "" : "number" != typeof u4 || _.test(l3) ? u4 : u4 + "px";
+  }
+  function N(n2, l3, u4, t3, i4) {
+    var r3, o3;
+    n: if ("style" == l3) if ("string" == typeof u4) n2.style.cssText = u4;
+    else {
+      if ("string" == typeof t3 && (n2.style.cssText = t3 = ""), t3) for (l3 in t3) u4 && l3 in u4 || z(n2.style, l3, "");
+      if (u4) for (l3 in u4) t3 && u4[l3] == t3[l3] || z(n2.style, l3, u4[l3]);
+    }
+    else if ("o" == l3[0] && "n" == l3[1]) r3 = l3 != (l3 = l3.replace(s, "$1")), o3 = l3.toLowerCase(), l3 = o3 in n2 || "onFocusOut" == l3 || "onFocusIn" == l3 ? o3.slice(2) : l3.slice(2), n2.l || (n2.l = {}), n2.l[l3 + r3] = u4, u4 ? t3 ? u4[a] = t3[a] : (u4[a] = h, n2.addEventListener(l3, r3 ? v : p, r3)) : n2.removeEventListener(l3, r3 ? v : p, r3);
+    else {
+      if ("http://www.w3.org/2000/svg" == i4) l3 = l3.replace(/xlink(H|:h)/, "h").replace(/sName$/, "s");
+      else if ("width" != l3 && "height" != l3 && "href" != l3 && "list" != l3 && "form" != l3 && "tabIndex" != l3 && "download" != l3 && "rowSpan" != l3 && "colSpan" != l3 && "role" != l3 && "popover" != l3 && l3 in n2) try {
+        n2[l3] = null == u4 ? "" : u4;
+        break n;
+      } catch (n3) {
+      }
+      "function" == typeof u4 || (null == u4 || false === u4 && "-" != l3[4] ? n2.removeAttribute(l3) : n2.setAttribute(l3, "popover" == l3 && 1 == u4 ? "" : u4));
+    }
+  }
+  function V(n2) {
+    return function(u4) {
+      if (this.l) {
+        var t3 = this.l[u4.type + n2];
+        if (null == u4[c]) u4[c] = h++;
+        else if (u4[c] < t3[a]) return;
+        return t3(l.event ? l.event(u4) : u4);
+      }
+    };
+  }
+  function q(n2, u4, t3, i4, r3, o3, e3, f4, c3, a3) {
+    var s3, h3, p3, v3, y3, d3, _2, k3, x2, M, $2, I2, P2, A2, H2, T3 = u4.type;
+    if (void 0 !== u4.constructor) return null;
+    128 & t3.__u && (c3 = !!(32 & t3.__u), o3 = [f4 = u4.__e = t3.__e]), (s3 = l.__b) && s3(u4);
+    n: if ("function" == typeof T3) try {
+      if (k3 = u4.props, x2 = T3.prototype && T3.prototype.render, M = (s3 = T3.contextType) && i4[s3.__c], $2 = s3 ? M ? M.props.value : s3.__ : i4, t3.__c ? _2 = (h3 = u4.__c = t3.__c).__ = h3.__E : (x2 ? u4.__c = h3 = new T3(k3, $2) : (u4.__c = h3 = new C(k3, $2), h3.constructor = T3, h3.render = Q), M && M.sub(h3), h3.state || (h3.state = {}), h3.__n = i4, p3 = h3.__d = true, h3.__h = [], h3._sb = []), x2 && null == h3.__s && (h3.__s = h3.state), x2 && null != T3.getDerivedStateFromProps && (h3.__s == h3.state && (h3.__s = m({}, h3.__s)), m(h3.__s, T3.getDerivedStateFromProps(k3, h3.__s))), v3 = h3.props, y3 = h3.state, h3.__v = u4, p3) x2 && null == T3.getDerivedStateFromProps && null != h3.componentWillMount && h3.componentWillMount(), x2 && null != h3.componentDidMount && h3.__h.push(h3.componentDidMount);
+      else {
+        if (x2 && null == T3.getDerivedStateFromProps && k3 !== v3 && null != h3.componentWillReceiveProps && h3.componentWillReceiveProps(k3, $2), u4.__v == t3.__v || !h3.__e && null != h3.shouldComponentUpdate && false === h3.shouldComponentUpdate(k3, h3.__s, $2)) {
+          u4.__v != t3.__v && (h3.props = k3, h3.state = h3.__s, h3.__d = false), u4.__e = t3.__e, u4.__k = t3.__k, u4.__k.some(function(n3) {
+            n3 && (n3.__ = u4);
+          }), w.push.apply(h3.__h, h3._sb), h3._sb = [], h3.__h.length && e3.push(h3);
+          break n;
+        }
+        null != h3.componentWillUpdate && h3.componentWillUpdate(k3, h3.__s, $2), x2 && null != h3.componentDidUpdate && h3.__h.push(function() {
+          h3.componentDidUpdate(v3, y3, d3);
+        });
+      }
+      if (h3.context = $2, h3.props = k3, h3.__P = n2, h3.__e = false, I2 = l.__r, P2 = 0, x2) h3.state = h3.__s, h3.__d = false, I2 && I2(u4), s3 = h3.render(h3.props, h3.state, h3.context), w.push.apply(h3.__h, h3._sb), h3._sb = [];
+      else do {
+        h3.__d = false, I2 && I2(u4), s3 = h3.render(h3.props, h3.state, h3.context), h3.state = h3.__s;
+      } while (h3.__d && ++P2 < 25);
+      h3.state = h3.__s, null != h3.getChildContext && (i4 = m(m({}, i4), h3.getChildContext())), x2 && !p3 && null != h3.getSnapshotBeforeUpdate && (d3 = h3.getSnapshotBeforeUpdate(v3, y3)), A2 = null != s3 && s3.type === S && null == s3.key ? E(s3.props.children) : s3, f4 = L(n2, g(A2) ? A2 : [A2], u4, t3, i4, r3, o3, e3, f4, c3, a3), h3.base = u4.__e, u4.__u &= -161, h3.__h.length && e3.push(h3), _2 && (h3.__E = h3.__ = null);
+    } catch (n3) {
+      if (u4.__v = null, c3 || null != o3) if (n3.then) {
+        for (u4.__u |= c3 ? 160 : 128; f4 && 8 == f4.nodeType && f4.nextSibling; ) f4 = f4.nextSibling;
+        o3[o3.indexOf(f4)] = null, u4.__e = f4;
+      } else {
+        for (H2 = o3.length; H2--; ) b(o3[H2]);
+        B(u4);
+      }
+      else u4.__e = t3.__e, u4.__k = t3.__k, n3.then || B(u4);
+      l.__e(n3, u4, t3);
+    }
+    else null == o3 && u4.__v == t3.__v ? (u4.__k = t3.__k, u4.__e = t3.__e) : f4 = u4.__e = G(t3.__e, u4, t3, i4, r3, o3, e3, c3, a3);
+    return (s3 = l.diffed) && s3(u4), 128 & u4.__u ? void 0 : f4;
+  }
+  function B(n2) {
+    n2 && (n2.__c && (n2.__c.__e = true), n2.__k && n2.__k.some(B));
+  }
+  function D(n2, u4, t3) {
+    for (var i4 = 0; i4 < t3.length; i4++) J(t3[i4], t3[++i4], t3[++i4]);
+    l.__c && l.__c(u4, n2), n2.some(function(u5) {
+      try {
+        n2 = u5.__h, u5.__h = [], n2.some(function(n3) {
+          n3.call(u5);
+        });
+      } catch (n3) {
+        l.__e(n3, u5.__v);
+      }
+    });
+  }
+  function E(n2) {
+    return "object" != typeof n2 || null == n2 || n2.__b > 0 ? n2 : g(n2) ? n2.map(E) : void 0 !== n2.constructor ? null : m({}, n2);
+  }
+  function G(u4, t3, i4, r3, o3, e3, f4, c3, a3) {
+    var s3, h3, p3, v3, y3, w3, _2, m3 = i4.props || d, k3 = t3.props, x2 = t3.type;
+    if ("svg" == x2 ? o3 = "http://www.w3.org/2000/svg" : "math" == x2 ? o3 = "http://www.w3.org/1998/Math/MathML" : o3 || (o3 = "http://www.w3.org/1999/xhtml"), null != e3) {
+      for (s3 = 0; s3 < e3.length; s3++) if ((y3 = e3[s3]) && "setAttribute" in y3 == !!x2 && (x2 ? y3.localName == x2 : 3 == y3.nodeType)) {
+        u4 = y3, e3[s3] = null;
+        break;
+      }
+    }
+    if (null == u4) {
+      if (null == x2) return document.createTextNode(k3);
+      u4 = document.createElementNS(o3, x2, k3.is && k3), c3 && (l.__m && l.__m(t3, e3), c3 = false), e3 = null;
+    }
+    if (null == x2) m3 === k3 || c3 && u4.data == k3 || (u4.data = k3);
+    else {
+      if (e3 = "textarea" == x2 && null != k3.defaultValue ? null : e3 && n.call(u4.childNodes), !c3 && null != e3) for (m3 = {}, s3 = 0; s3 < u4.attributes.length; s3++) m3[(y3 = u4.attributes[s3]).name] = y3.value;
+      for (s3 in m3) y3 = m3[s3], "dangerouslySetInnerHTML" == s3 ? p3 = y3 : "children" == s3 || s3 in k3 || "value" == s3 && "defaultValue" in k3 || "checked" == s3 && "defaultChecked" in k3 || N(u4, s3, null, y3, o3);
+      for (s3 in k3) y3 = k3[s3], "children" == s3 ? v3 = y3 : "dangerouslySetInnerHTML" == s3 ? h3 = y3 : "value" == s3 ? w3 = y3 : "checked" == s3 ? _2 = y3 : c3 && "function" != typeof y3 || m3[s3] === y3 || N(u4, s3, y3, m3[s3], o3);
+      if (h3) c3 || p3 && (h3.__html == p3.__html || h3.__html == u4.innerHTML) || (u4.innerHTML = h3.__html), t3.__k = [];
+      else if (p3 && (u4.innerHTML = ""), L("template" == t3.type ? u4.content : u4, g(v3) ? v3 : [v3], t3, i4, r3, "foreignObject" == x2 ? "http://www.w3.org/1999/xhtml" : o3, e3, f4, e3 ? e3[0] : i4.__k && $(i4, 0), c3, a3), null != e3) for (s3 = e3.length; s3--; ) b(e3[s3]);
+      c3 && "textarea" != x2 || (s3 = "value", "progress" == x2 && null == w3 ? u4.removeAttribute("value") : null != w3 && (w3 !== u4[s3] || "progress" == x2 && !w3 || "option" == x2 && w3 != m3[s3]) && N(u4, s3, w3, m3[s3], o3), s3 = "checked", null != _2 && _2 != u4[s3] && N(u4, s3, _2, m3[s3], o3));
+    }
+    return u4;
+  }
+  function J(n2, u4, t3) {
+    try {
+      if ("function" == typeof n2) {
+        var i4 = "function" == typeof n2.__u;
+        i4 && n2.__u(), i4 && null == u4 || (n2.__u = n2(u4));
+      } else n2.current = u4;
+    } catch (n3) {
+      l.__e(n3, t3);
+    }
+  }
+  function K(n2, u4, t3) {
+    var i4, r3;
+    if (l.unmount && l.unmount(n2), (i4 = n2.ref) && (i4.current && i4.current != n2.__e || J(i4, null, u4)), null != (i4 = n2.__c)) {
+      if (i4.componentWillUnmount) try {
+        i4.componentWillUnmount();
+      } catch (n3) {
+        l.__e(n3, u4);
+      }
+      i4.base = i4.__P = null;
+    }
+    if (i4 = n2.__k) for (r3 = 0; r3 < i4.length; r3++) i4[r3] && K(i4[r3], u4, t3 || "function" != typeof n2.type);
+    t3 || b(n2.__e), n2.__c = n2.__ = n2.__e = void 0;
+  }
+  function Q(n2, l3, u4) {
+    return this.constructor(n2, u4);
+  }
+  function R(u4, t3, i4) {
+    var r3, o3, e3, f4;
+    t3 == document && (t3 = document.documentElement), l.__ && l.__(u4, t3), o3 = (r3 = "function" == typeof i4) ? null : i4 && i4.__k || t3.__k, e3 = [], f4 = [], q(t3, u4 = (!r3 && i4 || t3).__k = k(S, null, [u4]), o3 || d, d, t3.namespaceURI, !r3 && i4 ? [i4] : o3 ? null : t3.firstChild ? n.call(t3.childNodes) : null, e3, !r3 && i4 ? i4 : o3 ? o3.__e : t3.firstChild, r3, f4), D(e3, u4, f4);
+  }
+  n = w.slice, l = { __e: function(n2, l3, u4, t3) {
+    for (var i4, r3, o3; l3 = l3.__; ) if ((i4 = l3.__c) && !i4.__) try {
+      if ((r3 = i4.constructor) && null != r3.getDerivedStateFromError && (i4.setState(r3.getDerivedStateFromError(n2)), o3 = i4.__d), null != i4.componentDidCatch && (i4.componentDidCatch(n2, t3 || {}), o3 = i4.__d), o3) return i4.__E = i4;
+    } catch (l4) {
+      n2 = l4;
+    }
+    throw n2;
+  } }, u = 0, t = function(n2) {
+    return null != n2 && void 0 === n2.constructor;
+  }, C.prototype.setState = function(n2, l3) {
+    var u4;
+    u4 = null != this.__s && this.__s != this.state ? this.__s : this.__s = m({}, this.state), "function" == typeof n2 && (n2 = n2(m({}, u4), this.props)), n2 && m(u4, n2), null != n2 && this.__v && (l3 && this._sb.push(l3), A(this));
+  }, C.prototype.forceUpdate = function(n2) {
+    this.__v && (this.__e = true, n2 && this.__h.push(n2), A(this));
+  }, C.prototype.render = S, i = [], o = "function" == typeof Promise ? Promise.prototype.then.bind(Promise.resolve()) : setTimeout, e = function(n2, l3) {
+    return n2.__v.__b - l3.__v.__b;
+  }, H.__r = 0, f = Math.random().toString(8), c = "__d" + f, a = "__a" + f, s = /(PointerCapture)$|Capture$/i, h = 0, p = V(false), v = V(true), y = 0;
+
+  // node_modules/preact/hooks/dist/hooks.module.js
+  var t2;
+  var r2;
+  var u2;
+  var i2;
+  var o2 = 0;
+  var f2 = [];
+  var c2 = l;
+  var e2 = c2.__b;
+  var a2 = c2.__r;
+  var v2 = c2.diffed;
+  var l2 = c2.__c;
+  var m2 = c2.unmount;
+  var s2 = c2.__;
+  function p2(n2, t3) {
+    c2.__h && c2.__h(r2, n2, o2 || t3), o2 = 0;
+    var u4 = r2.__H || (r2.__H = { __: [], __h: [] });
+    return n2 >= u4.__.length && u4.__.push({}), u4.__[n2];
+  }
+  function d2(n2) {
+    return o2 = 1, h2(D2, n2);
+  }
+  function h2(n2, u4, i4) {
+    var o3 = p2(t2++, 2);
+    if (o3.t = n2, !o3.__c && (o3.__ = [i4 ? i4(u4) : D2(void 0, u4), function(n3) {
+      var t3 = o3.__N ? o3.__N[0] : o3.__[0], r3 = o3.t(t3, n3);
+      t3 !== r3 && (o3.__N = [r3, o3.__[1]], o3.__c.setState({}));
+    }], o3.__c = r2, !r2.__f)) {
+      var f4 = function(n3, t3, r3) {
+        if (!o3.__c.__H) return true;
+        var u5 = o3.__c.__H.__.filter(function(n4) {
+          return n4.__c;
+        });
+        if (u5.every(function(n4) {
+          return !n4.__N;
+        })) return !c3 || c3.call(this, n3, t3, r3);
+        var i5 = o3.__c.props !== n3;
+        return u5.some(function(n4) {
+          if (n4.__N) {
+            var t4 = n4.__[0];
+            n4.__ = n4.__N, n4.__N = void 0, t4 !== n4.__[0] && (i5 = true);
+          }
+        }), c3 && c3.call(this, n3, t3, r3) || i5;
+      };
+      r2.__f = true;
+      var c3 = r2.shouldComponentUpdate, e3 = r2.componentWillUpdate;
+      r2.componentWillUpdate = function(n3, t3, r3) {
+        if (this.__e) {
+          var u5 = c3;
+          c3 = void 0, f4(n3, t3, r3), c3 = u5;
+        }
+        e3 && e3.call(this, n3, t3, r3);
+      }, r2.shouldComponentUpdate = f4;
+    }
+    return o3.__N || o3.__;
+  }
+  function y2(n2, u4) {
+    var i4 = p2(t2++, 3);
+    !c2.__s && C2(i4.__H, u4) && (i4.__ = n2, i4.u = u4, r2.__H.__h.push(i4));
+  }
+  function T2(n2, r3) {
+    var u4 = p2(t2++, 7);
+    return C2(u4.__H, r3) && (u4.__ = n2(), u4.__H = r3, u4.__h = n2), u4.__;
+  }
+  function j2() {
+    for (var n2; n2 = f2.shift(); ) {
+      var t3 = n2.__H;
+      if (n2.__P && t3) try {
+        t3.__h.some(z2), t3.__h.some(B2), t3.__h = [];
+      } catch (r3) {
+        t3.__h = [], c2.__e(r3, n2.__v);
+      }
+    }
+  }
+  c2.__b = function(n2) {
+    r2 = null, e2 && e2(n2);
+  }, c2.__ = function(n2, t3) {
+    n2 && t3.__k && t3.__k.__m && (n2.__m = t3.__k.__m), s2 && s2(n2, t3);
+  }, c2.__r = function(n2) {
+    a2 && a2(n2), t2 = 0;
+    var i4 = (r2 = n2.__c).__H;
+    i4 && (u2 === r2 ? (i4.__h = [], r2.__h = [], i4.__.some(function(n3) {
+      n3.__N && (n3.__ = n3.__N), n3.u = n3.__N = void 0;
+    })) : (i4.__h.some(z2), i4.__h.some(B2), i4.__h = [], t2 = 0)), u2 = r2;
+  }, c2.diffed = function(n2) {
+    v2 && v2(n2);
+    var t3 = n2.__c;
+    t3 && t3.__H && (t3.__H.__h.length && (1 !== f2.push(t3) && i2 === c2.requestAnimationFrame || ((i2 = c2.requestAnimationFrame) || w2)(j2)), t3.__H.__.some(function(n3) {
+      n3.u && (n3.__H = n3.u), n3.u = void 0;
+    })), u2 = r2 = null;
+  }, c2.__c = function(n2, t3) {
+    t3.some(function(n3) {
+      try {
+        n3.__h.some(z2), n3.__h = n3.__h.filter(function(n4) {
+          return !n4.__ || B2(n4);
+        });
+      } catch (r3) {
+        t3.some(function(n4) {
+          n4.__h && (n4.__h = []);
+        }), t3 = [], c2.__e(r3, n3.__v);
+      }
+    }), l2 && l2(n2, t3);
+  }, c2.unmount = function(n2) {
+    m2 && m2(n2);
+    var t3, r3 = n2.__c;
+    r3 && r3.__H && (r3.__H.__.some(function(n3) {
+      try {
+        z2(n3);
+      } catch (n4) {
+        t3 = n4;
+      }
+    }), r3.__H = void 0, t3 && c2.__e(t3, r3.__v));
+  };
+  var k2 = "function" == typeof requestAnimationFrame;
+  function w2(n2) {
+    var t3, r3 = function() {
+      clearTimeout(u4), k2 && cancelAnimationFrame(t3), setTimeout(n2);
+    }, u4 = setTimeout(r3, 35);
+    k2 && (t3 = requestAnimationFrame(r3));
+  }
+  function z2(n2) {
+    var t3 = r2, u4 = n2.__c;
+    "function" == typeof u4 && (n2.__c = void 0, u4()), r2 = t3;
+  }
+  function B2(n2) {
+    var t3 = r2;
+    n2.__c = n2.__(), r2 = t3;
+  }
+  function C2(n2, t3) {
+    return !n2 || n2.length !== t3.length || t3.some(function(t4, r3) {
+      return t4 !== n2[r3];
+    });
+  }
+  function D2(n2, t3) {
+    return "function" == typeof t3 ? t3(n2) : t3;
+  }
+
+  // src/data/tailwind.ts
+  var STEPS = ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900", "950"];
+  var RAW = {
+    slate: ["#f8fafc", "#f1f5f9", "#e2e8f0", "#cbd5e1", "#94a3b8", "#64748b", "#475569", "#334155", "#1e293b", "#0f172a", "#020617"],
+    gray: ["#f9fafb", "#f3f4f6", "#e5e7eb", "#d1d5db", "#9ca3af", "#6b7280", "#4b5563", "#374151", "#1f2937", "#111827", "#030712"],
+    zinc: ["#fafafa", "#f4f4f5", "#e4e4e7", "#d4d4d8", "#a1a1aa", "#71717a", "#52525b", "#3f3f46", "#27272a", "#18181b", "#09090b"],
+    neutral: ["#fafafa", "#f5f5f5", "#e5e5e5", "#d4d4d4", "#a3a3a3", "#737373", "#525252", "#404040", "#262626", "#171717", "#0a0a0a"],
+    stone: ["#fafaf9", "#f5f5f4", "#e7e5e4", "#d6d3d1", "#a8a29e", "#78716c", "#57534e", "#44403c", "#292524", "#1c1917", "#0c0a09"],
+    red: ["#fef2f2", "#fee2e2", "#fecaca", "#fca5a5", "#f87171", "#ef4444", "#dc2626", "#b91c1c", "#991b1b", "#7f1d1d", "#450a0a"],
+    orange: ["#fff7ed", "#ffedd5", "#fed7aa", "#fdba74", "#fb923c", "#f97316", "#ea580c", "#c2410c", "#9a3412", "#7c2d12", "#431407"],
+    amber: ["#fffbeb", "#fef3c7", "#fde68a", "#fcd34d", "#fbbf24", "#f59e0b", "#d97706", "#b45309", "#92400e", "#78350f", "#451a03"],
+    yellow: ["#fefce8", "#fef9c3", "#fef08a", "#fde047", "#facc15", "#eab308", "#ca8a04", "#a16207", "#854d0e", "#713f12", "#422006"],
+    lime: ["#f7fee7", "#ecfccb", "#d9f99d", "#bef264", "#a3e635", "#84cc16", "#65a30d", "#4d7c0f", "#3f6212", "#365314", "#1a2e05"],
+    green: ["#f0fdf4", "#dcfce7", "#bbf7d0", "#86efac", "#4ade80", "#22c55e", "#16a34a", "#15803d", "#166534", "#14532d", "#052e16"],
+    emerald: ["#ecfdf5", "#d1fae5", "#a7f3d0", "#6ee7b7", "#34d399", "#10b981", "#059669", "#047857", "#065f46", "#064e3b", "#022c22"],
+    teal: ["#f0fdfa", "#ccfbf1", "#99f6e4", "#5eead4", "#2dd4bf", "#14b8a6", "#0d9488", "#0f766e", "#115e59", "#134e4a", "#042f2e"],
+    cyan: ["#ecfeff", "#cffafe", "#a5f3fc", "#67e8f9", "#22d3ee", "#06b6d4", "#0891b2", "#0e7490", "#155e75", "#164e63", "#083344"],
+    sky: ["#f0f9ff", "#e0f2fe", "#bae6fd", "#7dd3fc", "#38bdf8", "#0ea5e9", "#0284c7", "#0369a1", "#075985", "#0c4a6e", "#082f49"],
+    blue: ["#eff6ff", "#dbeafe", "#bfdbfe", "#93c5fd", "#60a5fa", "#3b82f6", "#2563eb", "#1d4ed8", "#1e40af", "#1e3a8a", "#172554"],
+    indigo: ["#eef2ff", "#e0e7ff", "#c7d2fe", "#a5b4fc", "#818cf8", "#6366f1", "#4f46e5", "#4338ca", "#3730a3", "#312e81", "#1e1b4b"],
+    violet: ["#f5f3ff", "#ede9fe", "#ddd6fe", "#c4b5fd", "#a78bfa", "#8b5cf6", "#7c3aed", "#6d28d9", "#5b21b6", "#4c1d95", "#2e1065"],
+    purple: ["#faf5ff", "#f3e8ff", "#e9d5ff", "#d8b4fe", "#c084fc", "#a855f7", "#9333ea", "#7e22ce", "#6b21a8", "#581c87", "#3b0764"],
+    fuchsia: ["#fdf4ff", "#fae8ff", "#f5d0fe", "#f0abfc", "#e879f9", "#d946ef", "#c026d3", "#a21caf", "#86198f", "#701a75", "#4a044e"],
+    pink: ["#fdf2f8", "#fce7f3", "#fbcfe8", "#f9a8d4", "#f472b6", "#ec4899", "#db2777", "#be185d", "#9d174d", "#831843", "#500724"],
+    rose: ["#fff1f2", "#ffe4e6", "#fecdd3", "#fda4af", "#fb7185", "#f43f5e", "#e11d48", "#be123c", "#9f1239", "#881337", "#4c0519"]
+  };
+  function toScale(name, values) {
+    const shades = {};
+    STEPS.forEach((step, i4) => shades[step] = values[i4]);
+    return { name, label: name.charAt(0).toUpperCase() + name.slice(1), shades };
+  }
+  var tailwind = {
+    id: "tailwind",
+    label: "Tailwind CSS",
+    steps: STEPS,
+    scales: Object.entries(RAW).map(([name, values]) => toScale(name, values))
+  };
+
+  // src/data/material.ts
+  var STEPS2 = ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900"];
+  var RAW2 = {
+    red: ["#ffebee", "#ffcdd2", "#ef9a9a", "#e57373", "#ef5350", "#f44336", "#e53935", "#d32f2f", "#c62828", "#b71c1c"],
+    pink: ["#fce4ec", "#f8bbd0", "#f48fb1", "#f06292", "#ec407a", "#e91e63", "#d81b60", "#c2185b", "#ad1457", "#880e4f"],
+    purple: ["#f3e5f5", "#e1bee7", "#ce93d8", "#ba68c8", "#ab47bc", "#9c27b0", "#8e24aa", "#7b1fa2", "#6a1b9a", "#4a148c"],
+    deepPurple: ["#ede7f6", "#d1c4e9", "#b39ddb", "#9575cd", "#7e57c2", "#673ab7", "#5e35b1", "#512da8", "#4527a0", "#311b92"],
+    indigo: ["#e8eaf6", "#c5cae9", "#9fa8da", "#7986cb", "#5c6bc0", "#3f51b5", "#3949ab", "#303f9f", "#283593", "#1a237e"],
+    blue: ["#e3f2fd", "#bbdefb", "#90caf9", "#64b5f6", "#42a5f5", "#2196f3", "#1e88e5", "#1976d2", "#1565c0", "#0d47a1"],
+    lightBlue: ["#e1f5fe", "#b3e5fc", "#81d4fa", "#4fc3f7", "#29b6f6", "#03a9f4", "#039be5", "#0288d1", "#0277bd", "#01579b"],
+    cyan: ["#e0f7fa", "#b2ebf2", "#80deea", "#4dd0e1", "#26c6da", "#00bcd4", "#00acc1", "#0097a7", "#00838f", "#006064"],
+    teal: ["#e0f2f1", "#b2dfdb", "#80cbc4", "#4db6ac", "#26a69a", "#009688", "#00897b", "#00796b", "#00695c", "#004d40"],
+    green: ["#e8f5e9", "#c8e6c9", "#a5d6a7", "#81c784", "#66bb6a", "#4caf50", "#43a047", "#388e3c", "#2e7d32", "#1b5e20"],
+    lightGreen: ["#f1f8e9", "#dcedc8", "#c5e1a5", "#aed581", "#9ccc65", "#8bc34a", "#7cb342", "#689f38", "#558b2f", "#33691e"],
+    lime: ["#f9fbe7", "#f0f4c3", "#e6ee9c", "#dce775", "#d4e157", "#cddc39", "#c0ca33", "#afb42b", "#9e9d24", "#827717"],
+    yellow: ["#fffde7", "#fff9c4", "#fff59d", "#fff176", "#ffee58", "#ffeb3b", "#fdd835", "#fbc02d", "#f9a825", "#f57f17"],
+    amber: ["#fff8e1", "#ffecb3", "#ffe082", "#ffd54f", "#ffca28", "#ffc107", "#ffb300", "#ffa000", "#ff8f00", "#ff6f00"],
+    orange: ["#fff3e0", "#ffe0b2", "#ffcc80", "#ffb74d", "#ffa726", "#ff9800", "#fb8c00", "#f57c00", "#ef6c00", "#e65100"],
+    deepOrange: ["#fbe9e7", "#ffccbc", "#ffab91", "#ff8a65", "#ff7043", "#ff5722", "#f4511e", "#e64a19", "#d84315", "#bf360c"],
+    brown: ["#efebe9", "#d7ccc8", "#bcaaa4", "#a1887f", "#8d6e63", "#795548", "#6d4c41", "#5d4037", "#4e342e", "#3e2723"],
+    grey: ["#fafafa", "#f5f5f5", "#eeeeee", "#e0e0e0", "#bdbdbd", "#9e9e9e", "#757575", "#616161", "#424242", "#212121"],
+    blueGrey: ["#eceff1", "#cfd8dc", "#b0bec5", "#90a4ae", "#78909c", "#607d8b", "#546e7a", "#455a64", "#37474f", "#263238"]
+  };
+  var LABELS = {
+    deepPurple: "Deep Purple",
+    lightBlue: "Light Blue",
+    lightGreen: "Light Green",
+    deepOrange: "Deep Orange",
+    blueGrey: "Blue Grey"
+  };
+  function toScale2(name, values) {
+    const shades = {};
+    STEPS2.forEach((step, i4) => shades[step] = values[i4]);
+    const label = LABELS[name] ?? name.charAt(0).toUpperCase() + name.slice(1);
+    return { name, label, shades };
+  }
+  var material = {
+    id: "material",
+    label: "Material Design",
+    steps: STEPS2,
+    scales: Object.entries(RAW2).map(([name, values]) => toScale2(name, values))
+  };
+
+  // src/data/typography.ts
+  var defaultTypography = [
+    { name: "display", label: "Display", fontSize: 57, lineHeight: 64, fontWeight: 700, letterSpacing: -0.25 },
+    { name: "heading-1", label: "Heading 1", fontSize: 45, lineHeight: 52, fontWeight: 700, letterSpacing: 0 },
+    { name: "heading-2", label: "Heading 2", fontSize: 36, lineHeight: 44, fontWeight: 700, letterSpacing: 0 },
+    { name: "heading-3", label: "Heading 3", fontSize: 28, lineHeight: 36, fontWeight: 600, letterSpacing: 0 },
+    { name: "heading-4", label: "Heading 4", fontSize: 24, lineHeight: 32, fontWeight: 600, letterSpacing: 0 },
+    { name: "title", label: "Title", fontSize: 20, lineHeight: 28, fontWeight: 600, letterSpacing: 0 },
+    { name: "body-large", label: "Body Large", fontSize: 18, lineHeight: 28, fontWeight: 400, letterSpacing: 0 },
+    { name: "body", label: "Body", fontSize: 16, lineHeight: 24, fontWeight: 400, letterSpacing: 0 },
+    { name: "body-small", label: "Body Small", fontSize: 14, lineHeight: 20, fontWeight: 400, letterSpacing: 0 },
+    { name: "caption", label: "Caption", fontSize: 12, lineHeight: 16, fontWeight: 400, letterSpacing: 0.25 },
+    { name: "overline", label: "Overline", fontSize: 11, lineHeight: 16, fontWeight: 500, letterSpacing: 1 }
+  ];
+
+  // src/data/spacing.ts
+  var defaultSpacing = [
+    { name: "space-0", value: 0 },
+    { name: "space-1", value: 2 },
+    { name: "space-2", value: 4 },
+    { name: "space-3", value: 8 },
+    { name: "space-4", value: 12 },
+    { name: "space-5", value: 16 },
+    { name: "space-6", value: 20 },
+    { name: "space-7", value: 24 },
+    { name: "space-8", value: 32 },
+    { name: "space-9", value: 40 },
+    { name: "space-10", value: 48 },
+    { name: "space-11", value: 64 },
+    { name: "space-12", value: 80 },
+    { name: "space-13", value: 96 }
+  ];
+  var defaultRadius = [
+    { name: "radius-none", value: 0 },
+    { name: "radius-sm", value: 4 },
+    { name: "radius-md", value: 8 },
+    { name: "radius-lg", value: 12 },
+    { name: "radius-xl", value: 16 },
+    { name: "radius-2xl", value: 24 },
+    { name: "radius-full", value: 9999 }
+  ];
+
+  // src/data/index.ts
+  var libraries = [tailwind, material];
+  function getLibrary(id) {
+    return libraries.find((l3) => l3.id === id) ?? tailwind;
+  }
+
+  // src/ui/gemini.ts
+  var DEFAULT_BACKEND = "https://am-gym.vercel.app";
+  function getBackendUrl() {
+    try {
+      return localStorage.getItem("am-gym-backend") || DEFAULT_BACKEND;
+    } catch {
+      return DEFAULT_BACKEND;
+    }
+  }
+  function setBackendUrl(url) {
+    try {
+      localStorage.setItem("am-gym-backend", url.replace(/\/$/, ""));
+    } catch {
+    }
+  }
+  async function callGemini(task, prompt) {
+    const base = getBackendUrl().replace(/\/$/, "");
+    const res = await fetch(`${base}/api/gemini`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ task, prompt })
+    });
+    if (!res.ok) {
+      const detail = await res.text().catch(() => "");
+      throw new Error(`Backend error ${res.status}: ${detail.slice(0, 200)}`);
+    }
+    return await res.json();
+  }
+  function paletteToScale(p3) {
+    return {
+      name: p3.name,
+      label: p3.name.charAt(0).toUpperCase() + p3.name.slice(1),
+      shades: p3.shades
+    };
+  }
+
+  // node_modules/preact/jsx-runtime/dist/jsxRuntime.module.js
+  var f3 = 0;
+  var i3 = Array.isArray;
+  function u3(e3, t3, n2, o3, i4, u4) {
+    t3 || (t3 = {});
+    var a3, c3, p3 = t3;
+    if ("ref" in p3) for (c3 in p3 = {}, t3) "ref" == c3 ? a3 = t3[c3] : p3[c3] = t3[c3];
+    var l3 = { type: e3, props: p3, key: n2, ref: a3, __k: null, __: null, __b: 0, __e: null, __c: null, constructor: void 0, __v: --f3, __i: -1, __u: 0, __source: i4, __self: u4 };
+    if ("function" == typeof e3 && (a3 = e3.defaultProps)) for (c3 in a3) void 0 === p3[c3] && (p3[c3] = a3[c3]);
+    return l.vnode && l.vnode(l3), l3;
+  }
+
+  // src/ui/main.tsx
+  function send(msg) {
+    parent.postMessage({ pluginMessage: msg }, "*");
+  }
+  var TABS = ["Colors", "Tokens", "Type", "Spacing", "AI", "Export"];
+  function App() {
+    const [tab, setTab] = d2("Colors");
+    const [libraryId, setLibraryId] = d2(libraries[0].id);
+    const [selectedScales, setSelectedScales] = d2(["slate", "blue", "red", "green", "amber"]);
+    const [primaryScale, setPrimaryScale] = d2("blue");
+    const [modes, setModes] = d2(["light", "dark"]);
+    const [includeSemantic, setSemantic] = d2(true);
+    const [includeTypography, setTypography] = d2(true);
+    const [includeSpacing, setSpacing] = d2(true);
+    const [includeTextStyles, setTextStyles] = d2(true);
+    const [aiScales, setAiScales] = d2([]);
+    const [status, setStatus] = d2("");
+    const [statusErr, setStatusErr] = d2(false);
+    const [exportOut, setExportOut] = d2(null);
+    const lib = getLibrary(libraryId);
+    const allScales = T2(() => [...lib.scales, ...aiScales], [lib, aiScales]);
+    y2(() => {
+      function onMessage(e3) {
+        const msg = e3.data.pluginMessage;
+        if (!msg) return;
+        if (msg.type === "done") {
+          setStatus(msg.summary);
+          setStatusErr(false);
+        } else if (msg.type === "error") {
+          setStatus(msg.message);
+          setStatusErr(true);
+        } else if (msg.type === "export-result") {
+          setExportOut({ filename: msg.filename, content: msg.content });
+        }
+      }
+      window.addEventListener("message", onMessage);
+      return () => window.removeEventListener("message", onMessage);
+    }, []);
+    function buildConfig() {
+      return {
+        libraryId,
+        selectedScales,
+        extraScales: aiScales,
+        primaryScale,
+        modes,
+        includeSemantic,
+        includeTypography,
+        includeSpacing,
+        includeTextStyles,
+        typography: defaultTypography,
+        spacing: [...defaultSpacing, ...defaultRadius],
+        semantic: []
+      };
+    }
+    function toggleScale(name) {
+      setSelectedScales(
+        (prev) => prev.includes(name) ? prev.filter((s3) => s3 !== name) : [...prev, name]
+      );
+    }
+    function generate() {
+      setStatus("Generating\u2026");
+      send({ type: "generate", config: buildConfig() });
+    }
+    return /* @__PURE__ */ u3(S, { children: [
+      /* @__PURE__ */ u3("div", { class: "tabs", children: TABS.map((t3) => /* @__PURE__ */ u3("button", { class: `tab ${tab === t3 ? "active" : ""}`, onClick: () => setTab(t3), children: t3 })) }),
+      /* @__PURE__ */ u3("div", { class: "panel", children: [
+        tab === "Colors" && /* @__PURE__ */ u3(
+          ColorsTab,
+          {
+            lib,
+            allScales,
+            libraryId,
+            setLibraryId,
+            selectedScales,
+            toggleScale,
+            primaryScale,
+            setPrimaryScale,
+            modes,
+            setModes
+          }
+        ),
+        tab === "Tokens" && /* @__PURE__ */ u3(TokensTab, { includeSemantic, setSemantic }),
+        tab === "Type" && /* @__PURE__ */ u3(TypeTab, { includeTypography, setTypography, includeTextStyles, setTextStyles }),
+        tab === "Spacing" && /* @__PURE__ */ u3(SpacingTab, { includeSpacing, setSpacing }),
+        tab === "AI" && /* @__PURE__ */ u3(AITab, { onPalette: (p3) => {
+          setAiScales((prev) => [...prev.filter((s3) => s3.name !== p3.name), p3]);
+          setSelectedScales((prev) => prev.includes(p3.name) ? prev : [...prev, p3.name]);
+          setStatus(`AI palette "${p3.label}" added \u2014 switch to Colors to see it.`);
+        } }),
+        tab === "Export" && /* @__PURE__ */ u3(ExportTab, { buildConfig, exportOut })
+      ] }),
+      /* @__PURE__ */ u3("div", { class: "footer", children: [
+        /* @__PURE__ */ u3("button", { class: "btn btn-sm", onClick: () => send({ type: "print-docs", config: buildConfig() }), children: "Print docs" }),
+        /* @__PURE__ */ u3("span", { class: "spacer" }),
+        /* @__PURE__ */ u3("button", { class: "btn btn-primary", onClick: generate, children: "Generate foundations" })
+      ] }),
+      status && /* @__PURE__ */ u3("div", { class: `status ${statusErr ? "error" : ""}`, style: "padding:0 16px 10px", children: status })
+    ] });
+  }
+  function ModeChips({ modes, setModes }) {
+    function toggle(m3) {
+      if (modes.includes(m3)) {
+        const next = modes.filter((x2) => x2 !== m3);
+        setModes(next.length ? next : [m3]);
+      } else {
+        setModes([...modes, m3]);
+      }
+    }
+    return /* @__PURE__ */ u3("div", { class: "modes", children: ["light", "dark"].map((m3) => /* @__PURE__ */ u3("div", { class: `mode-chip ${modes.includes(m3) ? "on" : ""}`, onClick: () => toggle(m3), children: m3 === "light" ? "\u2600\uFE0E Light" : "\u263E Dark" })) });
+  }
+  function ColorsTab(props) {
+    return /* @__PURE__ */ u3("div", { children: [
+      /* @__PURE__ */ u3("h3", { children: "Color library" }),
+      /* @__PURE__ */ u3("p", { class: "muted", children: "Ready-to-use palettes from top design systems." }),
+      /* @__PURE__ */ u3("div", { class: "field", children: /* @__PURE__ */ u3("select", { value: props.libraryId, onChange: (e3) => props.setLibraryId(e3.target.value), children: libraries.map((l3) => /* @__PURE__ */ u3("option", { value: l3.id, children: l3.label })) }) }),
+      /* @__PURE__ */ u3("div", { class: "field", children: [
+        /* @__PURE__ */ u3("label", { class: "field-label", children: "Modes" }),
+        /* @__PURE__ */ u3(ModeChips, { modes: props.modes, setModes: props.setModes })
+      ] }),
+      /* @__PURE__ */ u3("label", { class: "field-label", children: "Scales \u2014 click to select, star = primary" }),
+      /* @__PURE__ */ u3("div", { class: "scale-grid", children: props.allScales.map((scale) => {
+        const selected = props.selectedScales.includes(scale.name);
+        const steps = Object.keys(scale.shades).sort((a3, b2) => Number(a3) - Number(b2));
+        const strip = [steps[1], steps[Math.floor(steps.length / 2)], steps[steps.length - 2]].filter(Boolean);
+        return /* @__PURE__ */ u3("div", { class: `scale-chip ${selected ? "selected" : ""}`, onClick: () => props.toggleScale(scale.name), children: [
+          /* @__PURE__ */ u3("div", { class: "swatch-strip", children: strip.map((s3) => /* @__PURE__ */ u3("span", { style: `background:${scale.shades[s3]}` })) }),
+          /* @__PURE__ */ u3("span", { class: "name", children: scale.label }),
+          /* @__PURE__ */ u3(
+            "span",
+            {
+              class: `star ${props.primaryScale === scale.name ? "on" : ""}`,
+              onClick: (e3) => {
+                e3.stopPropagation();
+                props.setPrimaryScale(scale.name);
+              },
+              children: "\u2605"
+            }
+          )
+        ] });
+      }) })
+    ] });
+  }
+  function TokensTab({ includeSemantic, setSemantic }) {
+    const names = ["Primary", "Success", "Error", "Warning", "Info", "Background", "Surface", "Border", "Text", "Text Muted"];
+    return /* @__PURE__ */ u3("div", { children: [
+      /* @__PURE__ */ u3("h3", { children: "Semantic / alias tokens" }),
+      /* @__PURE__ */ u3("p", { class: "muted", children: "Accessible, consistent meaning across light & dark \u2014 aliased to your base colors." }),
+      /* @__PURE__ */ u3("label", { class: "toggle", children: [
+        /* @__PURE__ */ u3("input", { type: "checkbox", checked: includeSemantic, onChange: (e3) => setSemantic(e3.target.checked) }),
+        "Generate semantic tokens collection"
+      ] }),
+      /* @__PURE__ */ u3("div", { class: "banner", children: "These resolve to aliases of your selected scales, so updating a base color updates the whole system." }),
+      /* @__PURE__ */ u3("div", { class: "row", children: names.map((n2) => /* @__PURE__ */ u3("span", { class: "btn btn-sm", children: n2 })) })
+    ] });
+  }
+  function TypeTab(props) {
+    return /* @__PURE__ */ u3("div", { children: [
+      /* @__PURE__ */ u3("h3", { children: "Typography" }),
+      /* @__PURE__ */ u3("p", { class: "muted", children: "A tokenized modular scale + matching Figma text styles." }),
+      /* @__PURE__ */ u3("label", { class: "toggle", children: [
+        /* @__PURE__ */ u3("input", { type: "checkbox", checked: props.includeTypography, onChange: (e3) => props.setTypography(e3.target.checked) }),
+        "Generate typography variables"
+      ] }),
+      /* @__PURE__ */ u3("label", { class: "toggle", children: [
+        /* @__PURE__ */ u3("input", { type: "checkbox", checked: props.includeTextStyles, onChange: (e3) => props.setTextStyles(e3.target.checked) }),
+        "Generate Figma text styles"
+      ] }),
+      /* @__PURE__ */ u3("div", { class: "field", style: "margin-top:12px", children: defaultTypography.map((t3) => /* @__PURE__ */ u3("div", { class: "token-row", children: [
+        /* @__PURE__ */ u3("span", { class: "tname", children: t3.label }),
+        /* @__PURE__ */ u3("span", { class: "tname", children: [
+          t3.fontSize,
+          "px"
+        ] }),
+        /* @__PURE__ */ u3("span", { class: "tname", children: [
+          t3.lineHeight,
+          "px"
+        ] }),
+        /* @__PURE__ */ u3("span", { class: "tname", children: t3.fontWeight })
+      ] })) })
+    ] });
+  }
+  function SpacingTab({ includeSpacing, setSpacing }) {
+    return /* @__PURE__ */ u3("div", { children: [
+      /* @__PURE__ */ u3("h3", { children: "Spacing & size" }),
+      /* @__PURE__ */ u3("p", { class: "muted", children: "A 4px base scale plus radius tokens for consistent layout." }),
+      /* @__PURE__ */ u3("label", { class: "toggle", children: [
+        /* @__PURE__ */ u3("input", { type: "checkbox", checked: includeSpacing, onChange: (e3) => setSpacing(e3.target.checked) }),
+        "Generate spacing & size variables"
+      ] }),
+      /* @__PURE__ */ u3("div", { class: "row", style: "margin-top:8px", children: [...defaultSpacing, ...defaultRadius].map((s3) => /* @__PURE__ */ u3("span", { class: "btn btn-sm", children: [
+        s3.name,
+        ": ",
+        s3.value
+      ] })) })
+    ] });
+  }
+  function AITab({ onPalette }) {
+    const [task, setTask] = d2("palette");
+    const [prompt, setPrompt] = d2("A calm, trustworthy fintech brand");
+    const [backend, setBackend] = d2(getBackendUrl());
+    const [loading, setLoading] = d2(false);
+    const [result, setResult] = d2(null);
+    const [err, setErr] = d2("");
+    async function run() {
+      setErr("");
+      setLoading(true);
+      setResult(null);
+      setBackendUrl(backend);
+      try {
+        const res = await callGemini(task, prompt);
+        if (task === "palette" && res.palette) {
+          const scale = paletteToScale(res.palette);
+          setResult({ kind: "palette", data: scale });
+        } else if (task === "typography" && res.typography) {
+          setResult({ kind: "typography", data: res.typography });
+        } else if (task === "svg" && res.svg) {
+          setResult({ kind: "svg", data: res.svg });
+        } else {
+          setResult({ kind: "text", data: res.text ?? res.raw ?? "(empty response)" });
+        }
+      } catch (e3) {
+        setErr(e3 instanceof Error ? e3.message : String(e3));
+      } finally {
+        setLoading(false);
+      }
+    }
+    return /* @__PURE__ */ u3("div", { children: [
+      /* @__PURE__ */ u3("h3", { children: "AI assistant (Gemini)" }),
+      /* @__PURE__ */ u3("p", { class: "muted", children: "Generate palettes, content, SVG art or type scales. The API key stays on your Vercel backend." }),
+      /* @__PURE__ */ u3("div", { class: "field", children: [
+        /* @__PURE__ */ u3("label", { class: "field-label", children: "Backend URL" }),
+        /* @__PURE__ */ u3("input", { type: "text", value: backend, onInput: (e3) => setBackend(e3.target.value), placeholder: "https://am-gym.vercel.app" })
+      ] }),
+      /* @__PURE__ */ u3("div", { class: "field", children: [
+        /* @__PURE__ */ u3("label", { class: "field-label", children: "Task" }),
+        /* @__PURE__ */ u3("select", { value: task, onChange: (e3) => setTask(e3.target.value), children: [
+          /* @__PURE__ */ u3("option", { value: "palette", children: "Color palette" }),
+          /* @__PURE__ */ u3("option", { value: "text", children: "Text / content" }),
+          /* @__PURE__ */ u3("option", { value: "svg", children: "SVG illustration (3D-style)" }),
+          /* @__PURE__ */ u3("option", { value: "typography", children: "Typography scale" })
+        ] })
+      ] }),
+      /* @__PURE__ */ u3("div", { class: "field", children: [
+        /* @__PURE__ */ u3("label", { class: "field-label", children: "Prompt" }),
+        /* @__PURE__ */ u3("textarea", { value: prompt, onInput: (e3) => setPrompt(e3.target.value) })
+      ] }),
+      /* @__PURE__ */ u3("button", { class: "btn btn-primary", style: "flex:none", disabled: loading, onClick: run, children: loading ? "Thinking\u2026" : "Generate with AI" }),
+      err && /* @__PURE__ */ u3("div", { class: "status error", style: "margin-top:10px", children: err }),
+      result?.kind === "palette" && /* @__PURE__ */ u3("div", { class: "ai-result", children: [
+        /* @__PURE__ */ u3("strong", { children: result.data.label }),
+        /* @__PURE__ */ u3("div", { class: "ai-swatches", children: Object.entries(result.data.shades).map(([, hex]) => /* @__PURE__ */ u3("span", { style: `background:${hex}`, title: hex })) }),
+        /* @__PURE__ */ u3("button", { class: "btn btn-sm", style: "margin-top:8px", onClick: () => onPalette(result.data), children: "Add to my colors" })
+      ] }),
+      result?.kind === "text" && /* @__PURE__ */ u3("div", { class: "ai-result", children: [
+        /* @__PURE__ */ u3("div", { style: "white-space:pre-wrap", children: result.data }),
+        /* @__PURE__ */ u3("button", { class: "btn btn-sm", style: "margin-top:8px", onClick: () => send({ type: "insert-text", text: result.data }), children: "Insert into canvas" })
+      ] }),
+      result?.kind === "svg" && /* @__PURE__ */ u3("div", { class: "ai-result", children: [
+        /* @__PURE__ */ u3("div", { dangerouslySetInnerHTML: { __html: result.data } }),
+        /* @__PURE__ */ u3("button", { class: "btn btn-sm", style: "margin-top:8px", onClick: () => send({ type: "insert-svg", svg: result.data }), children: "Insert into canvas" })
+      ] }),
+      result?.kind === "typography" && /* @__PURE__ */ u3("div", { class: "ai-result", children: result.data.map((t3) => /* @__PURE__ */ u3("div", { class: "token-row", children: [
+        /* @__PURE__ */ u3("span", { class: "tname", children: t3.label ?? t3.name }),
+        /* @__PURE__ */ u3("span", { class: "tname", children: [
+          t3.fontSize,
+          "px"
+        ] }),
+        /* @__PURE__ */ u3("span", { class: "tname", children: [
+          t3.lineHeight,
+          "px"
+        ] }),
+        /* @__PURE__ */ u3("span", { class: "tname", children: t3.fontWeight })
+      ] })) })
+    ] });
+  }
+  function ExportTab({ buildConfig, exportOut }) {
+    function exportAs(format) {
+      send({ type: "export", format, config: buildConfig() });
+    }
+    function download() {
+      if (!exportOut) return;
+      const blob = new Blob([exportOut.content], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a3 = document.createElement("a");
+      a3.href = url;
+      a3.download = exportOut.filename;
+      a3.click();
+      URL.revokeObjectURL(url);
+    }
+    return /* @__PURE__ */ u3("div", { children: [
+      /* @__PURE__ */ u3("h3", { children: "Export & documentation" }),
+      /* @__PURE__ */ u3("p", { class: "muted", children: "Share variables and styles with developers as CSS, JS or JSON." }),
+      /* @__PURE__ */ u3("div", { class: "row", children: [
+        /* @__PURE__ */ u3("button", { class: "btn btn-sm", onClick: () => exportAs("css"), children: "CSS" }),
+        /* @__PURE__ */ u3("button", { class: "btn btn-sm", onClick: () => exportAs("js"), children: "JS" }),
+        /* @__PURE__ */ u3("button", { class: "btn btn-sm", onClick: () => exportAs("json"), children: "JSON" })
+      ] }),
+      exportOut && /* @__PURE__ */ u3("div", { style: "margin-top:12px", children: [
+        /* @__PURE__ */ u3("div", { class: "row", children: [
+          /* @__PURE__ */ u3("strong", { children: exportOut.filename }),
+          /* @__PURE__ */ u3("span", { class: "spacer" }),
+          /* @__PURE__ */ u3("button", { class: "btn btn-sm", onClick: download, children: "Download" })
+        ] }),
+        /* @__PURE__ */ u3("textarea", { class: "export-out", readOnly: true, value: exportOut.content })
+      ] })
+    ] });
+  }
+  R(/* @__PURE__ */ u3(App, {}), document.getElementById("root"));
+})();
+</script>
+</body>
+</html>
