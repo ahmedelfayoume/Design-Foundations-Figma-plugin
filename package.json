@@ -1,0 +1,8 @@
+# Set these in your Vercel project (Settings → Environment Variables).
+# Never commit a real key.
+
+# Your Google Gemini API key (https://aistudio.google.com/app/apikey)
+GEMINI_API_KEY=your_key_here
+
+# Optional: override the model (defaults to gemini-2.0-flash)
+GEMINI_MODEL=gemini-2.0-flash
